@@ -1,0 +1,14 @@
+D:\Licenta\LZSS-CS\LZSS-ST\bin\Debug\net8.0\LZSS-ST.exe
+D:\Licenta\LZSS-CS\LZSS-ST\bin\Debug\net8.0\LZSS-ST.deps.json
+D:\Licenta\LZSS-CS\LZSS-ST\bin\Debug\net8.0\LZSS-ST.runtimeconfig.json
+D:\Licenta\LZSS-CS\LZSS-ST\bin\Debug\net8.0\LZSS-ST.dll
+D:\Licenta\LZSS-CS\LZSS-ST\bin\Debug\net8.0\LZSS-ST.pdb
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.GeneratedMSBuildEditorConfig.editorconfig
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.AssemblyInfoInputs.cache
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.AssemblyInfo.cs
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.csproj.CoreCompileInputs.cache
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.dll
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\refint\LZSS-ST.dll
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.pdb
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.genruntimeconfig.cache
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\ref\LZSS-ST.dll

@@ -1,0 +1,14 @@
+D:\Licenta\LZSS-CS\LZSS-MT\bin\Debug\net8.0\LZSS-MT.exe
+D:\Licenta\LZSS-CS\LZSS-MT\bin\Debug\net8.0\LZSS-MT.deps.json
+D:\Licenta\LZSS-CS\LZSS-MT\bin\Debug\net8.0\LZSS-MT.runtimeconfig.json
+D:\Licenta\LZSS-CS\LZSS-MT\bin\Debug\net8.0\LZSS-MT.dll
+D:\Licenta\LZSS-CS\LZSS-MT\bin\Debug\net8.0\LZSS-MT.pdb
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\LZSS-MT.GeneratedMSBuildEditorConfig.editorconfig
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\LZSS-MT.AssemblyInfoInputs.cache
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\LZSS-MT.AssemblyInfo.cs
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\LZSS-MT.csproj.CoreCompileInputs.cache
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\LZSS-MT.dll
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\refint\LZSS-MT.dll
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\LZSS-MT.pdb
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\LZSS-MT.genruntimeconfig.cache
+D:\Licenta\LZSS-CS\LZSS-MT\obj\Debug\net8.0\ref\LZSS-MT.dll

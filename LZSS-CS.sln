@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LZSS-MT", "LZSS-MT\LZSS-MT.csproj", "{334DAE00-4BEA-46B4-8F4E-F558A8394FAE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LZSS-ST", "LZSS-ST\LZSS-ST.csproj", "{6541D863-72B4-4EBE-A9BC-D38B76B74A45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LZSS-GPU", "LZSS-GPU\LZSS-GPU.csproj", "{F3700FFC-BAC8-4193-8C1B-40A0918F7540}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{334DAE00-4BEA-46B4-8F4E-F558A8394FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{334DAE00-4BEA-46B4-8F4E-F558A8394FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{334DAE00-4BEA-46B4-8F4E-F558A8394FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{334DAE00-4BEA-46B4-8F4E-F558A8394FAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6541D863-72B4-4EBE-A9BC-D38B76B74A45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6541D863-72B4-4EBE-A9BC-D38B76B74A45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6541D863-72B4-4EBE-A9BC-D38B76B74A45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6541D863-72B4-4EBE-A9BC-D38B76B74A45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3700FFC-BAC8-4193-8C1B-40A0918F7540}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3700FFC-BAC8-4193-8C1B-40A0918F7540}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3700FFC-BAC8-4193-8C1B-40A0918F7540}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3700FFC-BAC8-4193-8C1B-40A0918F7540}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22E18F13-E005-4F03-A75C-41E0D20C0678}
+	EndGlobalSection
+EndGlobal
