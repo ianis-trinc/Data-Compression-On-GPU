@@ -33,7 +33,6 @@ namespace LZSS
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
 
-
             Console.WriteLine("######################### GPU Compression #########################\n");
             // Display times
             Console.WriteLine($"Total compression time (CPU + GPU): {totalCompressionTime} ms");
@@ -68,7 +67,7 @@ namespace LZSS
                 // Measure the GPU kernel execution time
                 var gpuStopwatch = new Stopwatch();
                 gpuStopwatch.Start();
-                kernel(inputLength, inputBuffer.View, lengthBuffer.View, distanceBuffer.View, windowSize, maxMatchLength);
+                kernel((inputLength + 255) / 256, inputBuffer.View, lengthBuffer.View, distanceBuffer.View, windowSize, maxMatchLength);
                 accelerator.Synchronize();
                 gpuStopwatch.Stop();
                 gpuCompressionTime = gpuStopwatch.ElapsedMilliseconds;
