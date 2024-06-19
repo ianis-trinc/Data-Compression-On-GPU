@@ -121,11 +121,13 @@ namespace LZSS
             int bestMatchLength = 0;
             int bestMatchDistance = 0;
 
-            for (int j = Math.Max(0, pos - windowSize); j < pos; j++)
+            int start = Math.Max(0, pos - windowSize);
+            int end = (int)Math.Min(input.Length - pos, maxMatchLength);
+
+            for (int j = start; j < pos; j++)
             {
                 int matchLength = 0;
-                while (matchLength < maxMatchLength && pos + matchLength < input.Length &&
-                       input[j + matchLength] == input[pos + matchLength])
+                while (matchLength < end && input[j + matchLength] == input[pos + matchLength])
                 {
                     matchLength++;
                 }
