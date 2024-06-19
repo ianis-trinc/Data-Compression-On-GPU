@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LZSS-ST")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+de32777904a76eb606eb3d95dd5ed8d2add84c3d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d2721708f7463a5f8f8147184b06690e6b18e6b")]
 [assembly: System.Reflection.AssemblyProductAttribute("LZSS-ST")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LZSS-ST")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

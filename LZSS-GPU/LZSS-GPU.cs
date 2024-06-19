@@ -5,6 +5,7 @@ using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
 using System.Text;
+using System.Collections.Generic;
 
 namespace LZSS
 {
@@ -58,8 +59,8 @@ namespace LZSS
 
         static (byte[], long) Compress(byte[] input)
         {
-            int windowSize = 4096;
-            int maxMatchLength = 18;
+            int windowSize = 1024;
+            int maxMatchLength = 32;
             int inputLength = input.Length;
             var output = new MemoryStream();
             long gpuCompressionTime = 0;
@@ -96,14 +97,15 @@ namespace LZSS
 
                     if (bestMatchLength >= 3)
                     {
-                        output.WriteByte((byte)(1 << 7 | (bestMatchDistance >> 8)));
+                        output.WriteByte(1); // Flag to indicate a match
+                        output.WriteByte((byte)(bestMatchDistance >> 8));
                         output.WriteByte((byte)(bestMatchDistance & 0xFF));
-                        output.WriteByte((byte)(bestMatchLength - 3));
+                        output.WriteByte((byte)bestMatchLength);
                         pos += bestMatchLength;
                     }
                     else
                     {
-                        output.WriteByte(0);
+                        output.WriteByte(0); // Flag to indicate a literal
                         output.WriteByte(input[pos]);
                         pos++;
                     }
@@ -145,31 +147,45 @@ namespace LZSS
 
         static byte[] Decompress(byte[] input)
         {
-            var output = new MemoryStream();
-            int pos = 0;
+            List<byte> decompressed = new List<byte>();
+            int i = 0;
 
-            while (pos < input.Length)
+            while (i < input.Length)
             {
-                int flag = input[pos] >> 7;
-                if (flag == 1)
+                byte flag = input[i++];
+                if (flag == 0)
                 {
-                    int distance = ((input[pos] & 0x7F) << 8) | input[pos + 1];
-                    int length = input[pos + 2] + 3;
-                    long start = output.Length - distance;
-                    for (int i = 0; i < length; i++)
+                    if (i < input.Length)
                     {
-                        output.WriteByte((byte)output.GetBuffer()[start + i]);
+                        decompressed.Add(input[i++]);
                     }
-                    pos += 3;
+                }
+                else if (flag == 1)
+                {
+                    if (i + 2 < input.Length)
+                    {
+                        int matchDistance = (input[i] << 8) | input[i + 1];
+                        int matchLength = input[i + 2];
+                        i += 3;
+
+                        int start = decompressed.Count - matchDistance;
+                        if (start < 0)
+                        {
+                            throw new Exception("Invalid match distance during decompression");
+                        }
+                        for (int j = 0; j < matchLength; j++)
+                        {
+                            decompressed.Add(decompressed[start + j]);
+                        }
+                    }
                 }
                 else
                 {
-                    output.WriteByte(input[pos + 1]);
-                    pos += 2;
+                    throw new Exception("Invalid flag value during decompression");
                 }
             }
 
-            return output.ToArray();
+            return decompressed.ToArray();
         }
     }
 }
