@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LZSS-GPU")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+04efc9de9c961fee927d2bba21ac16242eec423d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+de32777904a76eb606eb3d95dd5ed8d2add84c3d")]
 [assembly: System.Reflection.AssemblyProductAttribute("LZSS-GPU")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LZSS-GPU")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

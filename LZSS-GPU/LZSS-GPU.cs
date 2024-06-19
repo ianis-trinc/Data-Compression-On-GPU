@@ -4,6 +4,7 @@ using System.IO;
 using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
+using System.Text;
 
 namespace LZSS
 {
@@ -15,7 +16,7 @@ namespace LZSS
 
             // Read input text from file
             string inputText = File.ReadAllText(Path.Combine(folderPath, "input.txt"));
-            byte[] input = System.Text.Encoding.UTF8.GetBytes(inputText);
+            byte[] input = Encoding.UTF8.GetBytes(inputText);
 
             // Measure compression time
             var stopwatch = new Stopwatch();
@@ -30,8 +31,16 @@ namespace LZSS
             byte[] decompressedData = Decompress(compressedData);
             stopwatch.Stop();
             long decompressionTime = stopwatch.ElapsedMilliseconds;
-            string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
-            File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
+            string decompressedText = Encoding.UTF8.GetString(decompressedData);
+
+            try
+            {
+                File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Error writing decompressed text to file: {ex.Message}");
+            }
 
             Console.WriteLine("######################### GPU Compression #########################\n");
             // Display times
@@ -42,6 +51,9 @@ namespace LZSS
             // Check integrity
             bool isMatch = inputText == decompressedText;
             Console.WriteLine($"Integrity check: {(isMatch ? "PASSED" : "FAILED")}");
+            Console.WriteLine($"Original size: {input.Length} bytes");
+            Console.WriteLine($"Compressed size: {compressedData.Length} bytes");
+            Console.WriteLine($"Compression ratio: {(double)compressedData.Length / input.Length:P2}");
         }
 
         static (byte[], long) Compress(byte[] input)
@@ -67,7 +79,7 @@ namespace LZSS
                 // Measure the GPU kernel execution time
                 var gpuStopwatch = new Stopwatch();
                 gpuStopwatch.Start();
-                kernel((inputLength + 255) / 256, inputBuffer.View, lengthBuffer.View, distanceBuffer.View, windowSize, maxMatchLength);
+                kernel(inputLength, inputBuffer.View, lengthBuffer.View, distanceBuffer.View, windowSize, maxMatchLength);
                 accelerator.Synchronize();
                 gpuStopwatch.Stop();
                 gpuCompressionTime = gpuStopwatch.ElapsedMilliseconds;
