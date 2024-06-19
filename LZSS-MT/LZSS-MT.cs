@@ -33,6 +33,8 @@ namespace LZSS
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
 
+
+            Console.WriteLine("################################ CPU with multithreading version ################################\n");
             // Display times
             Console.WriteLine($"Compression time: {compressionTime} ms");
             Console.WriteLine($"Decompression time: {decompressionTime} ms");

@@ -12,3 +12,4 @@ D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\refint\LZSS-ST.dll
 D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.pdb
 D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.genruntimeconfig.cache
 D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\ref\LZSS-ST.dll
+D:\Licenta\LZSS-CS\LZSS-ST\obj\Debug\net8.0\LZSS-ST.sourcelink.json

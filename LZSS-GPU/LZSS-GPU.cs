@@ -20,9 +20,9 @@ namespace LZSS
             // Measure compression time
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            byte[] compressedData = Compress(input);
+            (byte[] compressedData, long gpuCompressionTime) = Compress(input);
             stopwatch.Stop();
-            long compressionTime = stopwatch.ElapsedMilliseconds;
+            long totalCompressionTime = stopwatch.ElapsedMilliseconds;
             File.WriteAllBytes(Path.Combine(folderPath, "compressed.bin"), compressedData);
 
             // Measure decompression time
@@ -33,8 +33,11 @@ namespace LZSS
             string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
             File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
 
+
+            Console.WriteLine("######################### GPU Compression #########################\n");
             // Display times
-            Console.WriteLine($"Compression time: {compressionTime} ms");
+            Console.WriteLine($"Total compression time (CPU + GPU): {totalCompressionTime} ms");
+            Console.WriteLine($"GPU compression time: {gpuCompressionTime} ms");
             Console.WriteLine($"Decompression time: {decompressionTime} ms");
 
             // Check integrity
@@ -42,13 +45,13 @@ namespace LZSS
             Console.WriteLine($"Integrity check: {(isMatch ? "PASSED" : "FAILED")}");
         }
 
-        static byte[] Compress(byte[] input)
+        static (byte[], long) Compress(byte[] input)
         {
             int windowSize = 4096;
             int maxMatchLength = 18;
             int inputLength = input.Length;
             var output = new MemoryStream();
-            var stopwatch = new Stopwatch();
+            long gpuCompressionTime = 0;
 
             // Initialize ILGPU context and accelerator
             using (var context = Context.Create(builder => builder.Cuda()))
@@ -61,12 +64,15 @@ namespace LZSS
 
                 // Load and launch kernel
                 var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<byte>, ArrayView<int>, ArrayView<int>, int, int>(FindBestMatchKernel);
-                stopwatch.Start();
-                // Launch the kernel
+
+                // Measure the GPU kernel execution time
+                var gpuStopwatch = new Stopwatch();
+                gpuStopwatch.Start();
                 kernel(inputLength, inputBuffer.View, lengthBuffer.View, distanceBuffer.View, windowSize, maxMatchLength);
                 accelerator.Synchronize();
-                stopwatch.Stop();
-                Console.WriteLine($"The real time for compression on GPU: {stopwatch.ElapsedMilliseconds}");
+                gpuStopwatch.Stop();
+                gpuCompressionTime = gpuStopwatch.ElapsedMilliseconds;
+
                 // Retrieve the output data
                 var lengths = lengthBuffer.GetAsArray1D();
                 var distances = distanceBuffer.GetAsArray1D();
@@ -93,7 +99,7 @@ namespace LZSS
                 }
             }
 
-            return output.ToArray();
+            return (output.ToArray(), gpuCompressionTime);
         }
 
         static void FindBestMatchKernel(Index1D index, ArrayView<byte> input, ArrayView<int> lengths, ArrayView<int> distances, int windowSize, int maxMatchLength)
