@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Collections.Generic;
 using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
@@ -19,15 +17,10 @@ namespace LZSS
             string inputText = File.ReadAllText(Path.Combine(folderPath, "input.txt"));
             byte[] input = System.Text.Encoding.UTF8.GetBytes(inputText);
 
-            // Initialize ILGPU context and CUDA accelerator
-            using var context = Context.Create(builder => builder.Cuda());
-            using var accelerator = context.CreateCudaAccelerator(0);
-            using var stream = accelerator.CreateStream();
-
             // Measure compression time
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            byte[] compressedData = Compress(input, accelerator, stream);
+            byte[] compressedData = Compress(input);
             stopwatch.Stop();
             long compressionTime = stopwatch.ElapsedMilliseconds;
             File.WriteAllBytes(Path.Combine(folderPath, "compressed.bin"), compressedData);
@@ -44,137 +37,120 @@ namespace LZSS
             Console.WriteLine($"Compression time: {compressionTime} ms");
             Console.WriteLine($"Decompression time: {decompressionTime} ms");
 
-            // Integrity check
+            // Check integrity
             bool isMatch = inputText == decompressedText;
             Console.WriteLine($"Integrity check: {(isMatch ? "PASSED" : "FAILED")}");
         }
 
-        static byte[] Compress(byte[] input, Accelerator accelerator, AcceleratorStream stream)
+        static byte[] Compress(byte[] input)
         {
-            int numThreads = Environment.ProcessorCount;
-            int blockSize = (int)Math.Ceiling(input.Length / (double)numThreads);
-            int estimatedOutputSize = input.Length / 2; // Estimating output size
-            using var inputBuffer = accelerator.Allocate1D<byte>(input.Length);
-            using var outputBuffer = accelerator.Allocate1D<byte>(estimatedOutputSize);
+            int windowSize = 4096;
+            int maxMatchLength = 18;
+            int inputLength = input.Length;
+            var output = new MemoryStream();
+            var stopwatch = new Stopwatch();
 
-            // Copy input data to GPU
-            inputBuffer.CopyFromCPU(input);
-
-            // Define a kernel function for compression
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView1D<byte, Stride1D.Dense>, ArrayView1D<byte, Stride1D.Dense>>(CompressKernel);
-
-            // Launch the kernel
-            kernel((int)Math.Ceiling(input.Length / 256.0) * 256, inputBuffer.View, outputBuffer.View);
-
-            // Synchronize and copy results back to CPU
-            stream.Synchronize();
-            byte[] compressedData = new byte[estimatedOutputSize];
-            outputBuffer.CopyToCPU(compressedData);
-
-            // Adjust the output size based on the actual compressed data length
-            int actualOutputSize = compressedData.Length;
-            for (int i = compressedData.Length - 1; i >= 0; i--)
+            // Initialize ILGPU context and accelerator
+            using (var context = Context.Create(builder => builder.Cuda()))
+            using (var accelerator = context.CreateCudaAccelerator(0))
             {
-                if (compressedData[i] != 0)
+                // Allocate input and output buffers
+                using var inputBuffer = accelerator.Allocate1D(input);
+                using var lengthBuffer = accelerator.Allocate1D<int>(inputLength);
+                using var distanceBuffer = accelerator.Allocate1D<int>(inputLength);
+
+                // Load and launch kernel
+                var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<byte>, ArrayView<int>, ArrayView<int>, int, int>(FindBestMatchKernel);
+                stopwatch.Start();
+                // Launch the kernel
+                kernel(inputLength, inputBuffer.View, lengthBuffer.View, distanceBuffer.View, windowSize, maxMatchLength);
+                accelerator.Synchronize();
+                stopwatch.Stop();
+                Console.WriteLine($"The real time for compression on GPU: {stopwatch.ElapsedMilliseconds}");
+                // Retrieve the output data
+                var lengths = lengthBuffer.GetAsArray1D();
+                var distances = distanceBuffer.GetAsArray1D();
+
+                // Process the output data to generate the compressed data
+                for (int pos = 0; pos < inputLength;)
                 {
-                    actualOutputSize = i + 1;
-                    break;
+                    int bestMatchLength = lengths[pos];
+                    int bestMatchDistance = distances[pos];
+
+                    if (bestMatchLength >= 3)
+                    {
+                        output.WriteByte((byte)(1 << 7 | (bestMatchDistance >> 8)));
+                        output.WriteByte((byte)(bestMatchDistance & 0xFF));
+                        output.WriteByte((byte)(bestMatchLength - 3));
+                        pos += bestMatchLength;
+                    }
+                    else
+                    {
+                        output.WriteByte(0);
+                        output.WriteByte(input[pos]);
+                        pos++;
+                    }
                 }
             }
-            Array.Resize(ref compressedData, actualOutputSize);
 
-            return compressedData;
+            return output.ToArray();
         }
 
-        static void CompressKernel(Index1D index, ArrayView1D<byte, Stride1D.Dense> input, ArrayView1D<byte, Stride1D.Dense> output)
+        static void FindBestMatchKernel(Index1D index, ArrayView<byte> input, ArrayView<int> lengths, ArrayView<int> distances, int windowSize, int maxMatchLength)
         {
-            long i = index;
-            long n = input.Length;
-            int windowSize = 4096;
-            int lookAheadBufferSize = 18;
-            int minMatchLength = 3;
+            int pos = index;
+            if (pos >= input.Length) return;
 
-            if (i < n)
+            int bestMatchLength = 0;
+            int bestMatchDistance = 0;
+
+            for (int j = Math.Max(0, pos - windowSize); j < pos; j++)
             {
                 int matchLength = 0;
-                int matchDistance = 0;
-
-                for (long j = Math.Max(0, i - windowSize); j < i; j++)
+                while (matchLength < maxMatchLength && pos + matchLength < input.Length &&
+                       input[j + matchLength] == input[pos + matchLength])
                 {
-                    int k = 0;
-                    while (k < lookAheadBufferSize && i + k < n && input[j + k] == input[i + k])
-                    {
-                        k++;
-                    }
-                    if (k > matchLength && k >= minMatchLength)
-                    {
-                        matchLength = k;
-                        matchDistance = (int)(i - j);
-                    }
+                    matchLength++;
                 }
 
-                if (matchLength >= minMatchLength)
+                if (matchLength > bestMatchLength)
                 {
-                    if (i * 4 + 3 < output.Length)
-                    {
-                        output[(int)(i * 4)] = 1; // Flag to indicate a match
-                        output[(int)(i * 4 + 1)] = (byte)(matchDistance >> 8);
-                        output[(int)(i * 4 + 2)] = (byte)(matchDistance & 0xFF);
-                        output[(int)(i * 4 + 3)] = (byte)matchLength;
-                    }
-                }
-                else
-                {
-                    if (i * 2 + 1 < output.Length)
-                    {
-                        output[(int)(i * 2)] = 0; // Flag to indicate a literal
-                        output[(int)(i * 2 + 1)] = input[i];
-                    }
+                    bestMatchLength = matchLength;
+                    bestMatchDistance = pos - j;
                 }
             }
+
+            lengths[pos] = bestMatchLength;
+            distances[pos] = bestMatchDistance;
         }
 
         static byte[] Decompress(byte[] input)
         {
-            List<byte> decompressed = new List<byte>();
-            int i = 0;
+            var output = new MemoryStream();
+            int pos = 0;
 
-            while (i < input.Length)
+            while (pos < input.Length)
             {
-                byte flag = input[i++];
-                if (flag == 0)
+                int flag = input[pos] >> 7;
+                if (flag == 1)
                 {
-                    if (i < input.Length)
+                    int distance = ((input[pos] & 0x7F) << 8) | input[pos + 1];
+                    int length = input[pos + 2] + 3;
+                    long start = output.Length - distance;
+                    for (int i = 0; i < length; i++)
                     {
-                        decompressed.Add(input[i++]);
+                        output.WriteByte((byte)output.GetBuffer()[start + i]);
                     }
-                }
-                else if (flag == 1)
-                {
-                    if (i + 2 < input.Length)
-                    {
-                        int matchDistance = (input[i] << 8) | input[i + 1];
-                        int matchLength = input[i + 2];
-                        i += 3;
-
-                        int start = decompressed.Count - matchDistance;
-                        if (start < 0)
-                        {
-                            throw new Exception("Invalid match distance during decompression");
-                        }
-                        for (int j = 0; j < matchLength; j++)
-                        {
-                            decompressed.Add(decompressed[start + j]);
-                        }
-                    }
+                    pos += 3;
                 }
                 else
                 {
-                    throw new Exception("Invalid flag value during decompression");
+                    output.WriteByte(input[pos + 1]);
+                    pos += 2;
                 }
             }
 
-            return decompressed.ToArray();
+            return output.ToArray();
         }
     }
 }
