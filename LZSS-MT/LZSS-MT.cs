@@ -6,37 +6,63 @@ class Program
 {
     static void Main()
     {
-        string folderPath = @"D:\Licenta\LZSS-CS\LZSS-MT\test\";
+        string repositoryName = "Data-Compression-On-GPU";
+        string relativePath = Path.Combine("LZSS-GPU", "test");
+        string? basePath = FindRepositoryDirectory(Environment.CurrentDirectory, repositoryName);
+        string? folderPath = null;
 
+        if (basePath != null)
+        {
+            folderPath = Path.Combine(basePath, relativePath);
+        }
         // Read input text from file
-        string inputText = File.ReadAllText(Path.Combine(folderPath, "input.txt"));
-        byte[] input = System.Text.Encoding.UTF8.GetBytes(inputText);
+        if (folderPath != null)
+        {
+            string inputText = File.ReadAllText(Path.Combine(folderPath, "input.txt"));
+            byte[] input = System.Text.Encoding.UTF8.GetBytes(inputText);
 
-        // Measure compression time
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        byte[] compressedData = Compress(input);
-        stopwatch.Stop();
-        long compressionTime = stopwatch.ElapsedMilliseconds;
-        File.WriteAllBytes(Path.Combine(folderPath, "compressed.bin"), compressedData);
+            // Measure compression time
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            byte[] compressedData = Compress(input);
+            stopwatch.Stop();
+            long compressionTime = stopwatch.ElapsedMilliseconds;
+            File.WriteAllBytes(Path.Combine(folderPath, "compressed.bin"), compressedData);
 
-        // Measure decompression time
-        stopwatch.Restart();
-        byte[] decompressedData = Decompress(compressedData);
-        stopwatch.Stop();
-        long decompressionTime = stopwatch.ElapsedMilliseconds;
-        string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
-        File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
+            // Measure decompression time
+            stopwatch.Restart();
+            byte[] decompressedData = Decompress(compressedData);
+            stopwatch.Stop();
+            long decompressionTime = stopwatch.ElapsedMilliseconds;
+            string decompressedText = System.Text.Encoding.UTF8.GetString(decompressedData);
+            File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
 
 
-        Console.WriteLine("################################ CPU with multithreading version ################################\n");
-        // Display times
-        Console.WriteLine($"Compression time: {compressionTime} ms");
-        Console.WriteLine($"Decompression time: {decompressionTime} ms");
+            Console.WriteLine("################################ CPU with multithreading version ################################\n");
+            // Display times
+            Console.WriteLine($"Compression time: {compressionTime} ms");
+            Console.WriteLine($"Decompression time: {decompressionTime} ms");
 
-        // Integrity check
-        bool isMatch = inputText == decompressedText;
-        Console.WriteLine($"Integrity check: {(isMatch ? "PASSED" : "FAILED")}");
+            // Integrity check
+            bool isMatch = inputText == decompressedText;
+            Console.WriteLine($"Integrity check: {(isMatch ? "PASSED" : "FAILED")}");
+        }
+    }
+
+    static string? FindRepositoryDirectory(string currentPath, string repositoryName)
+    {
+        DirectoryInfo? dir = new DirectoryInfo(currentPath);
+
+        while (dir != null)
+        {
+            if (Directory.Exists(Path.Combine(dir.FullName, repositoryName)))
+            {
+                return Path.Combine(dir.FullName, repositoryName);
+            }
+            dir = dir.Parent;
+        }
+
+        return null;
     }
 
     static byte[] Compress(byte[] input)
@@ -62,7 +88,7 @@ class Program
         List<byte> compressed = new List<byte>();
         int i = 0;
         int n = input.Length;
-        int windowSize = 4096;
+        int windowSize = 2048;
         int lookAheadBufferSize = 18;
         int minMatchLength = 3;
 

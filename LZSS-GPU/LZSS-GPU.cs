@@ -10,48 +10,75 @@ class Program
 {
     static void Main()
     {
-        string folderPath = @"D:\Licenta\LZSS-CS\LZSS-GPU\test\";
+        string repositoryName = "Data-Compression-On-GPU";
+        string relativePath = Path.Combine("LZSS-GPU", "test");
+        string? basePath = FindRepositoryDirectory(Environment.CurrentDirectory, repositoryName);
+        string? folderPath = null;
+
+        if (basePath != null)
+        {
+            folderPath = Path.Combine(basePath, relativePath);
+        }
 
         // Read input text from file
-        string inputText = File.ReadAllText(Path.Combine(folderPath, "input.txt"));
-        byte[] input = Encoding.UTF8.GetBytes(inputText);
-
-        // Measure compression time
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        (byte[] compressedData, long gpuCompressionTime) = Compress(input);
-        stopwatch.Stop();
-        long totalCompressionTime = stopwatch.ElapsedMilliseconds;
-        File.WriteAllBytes(Path.Combine(folderPath, "compressed.bin"), compressedData);
-
-        // Measure decompression time
-        stopwatch.Restart();
-        byte[] decompressedData = Decompress(compressedData);
-        stopwatch.Stop();
-        long decompressionTime = stopwatch.ElapsedMilliseconds;
-        string decompressedText = Encoding.UTF8.GetString(decompressedData);
-
-        try
+        if (folderPath != null)
         {
-            File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
+            string inputText = File.ReadAllText(Path.Combine(folderPath, "input.txt"));
+            byte[] input = Encoding.UTF8.GetBytes(inputText);
+
+            // Measure compression time
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            (byte[] compressedData, long gpuCompressionTime) = Compress(input);
+            stopwatch.Stop();
+            long totalCompressionTime = stopwatch.ElapsedMilliseconds;
+            File.WriteAllBytes(Path.Combine(folderPath, "compressed.bin"), compressedData);
+
+            // Measure decompression time
+            stopwatch.Restart();
+            byte[] decompressedData = Decompress(compressedData);
+            stopwatch.Stop();
+            long decompressionTime = stopwatch.ElapsedMilliseconds;
+            string decompressedText = Encoding.UTF8.GetString(decompressedData);
+
+            try
+            {
+                File.WriteAllText(Path.Combine(folderPath, "decompressed.txt"), decompressedText);
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Error writing decompressed text to file: {ex.Message}");
+            }
+
+            Console.WriteLine("######################### GPU Compression #########################\n");
+            // Display times
+            Console.WriteLine($"Total compression time (CPU + GPU): {totalCompressionTime} ms");
+            Console.WriteLine($"GPU compression time: {gpuCompressionTime} ms");
+            Console.WriteLine($"Decompression time: {decompressionTime} ms");
+
+            // Check integrity
+            bool isMatch = inputText == decompressedText;
+            Console.WriteLine($"Integrity check: {(isMatch ? "PASSED" : "FAILED")}");
+            Console.WriteLine($"Original size: {input.Length} bytes");
+            Console.WriteLine($"Compressed size: {compressedData.Length} bytes");
+            Console.WriteLine($"Compression ratio: {(double)compressedData.Length / input.Length:P2}");
         }
-        catch (IOException ex)
+    }
+
+    static string? FindRepositoryDirectory(string currentPath, string repositoryName)
+    {
+        DirectoryInfo? dir = new DirectoryInfo(currentPath);
+
+        while (dir != null)
         {
-            Console.WriteLine($"Error writing decompressed text to file: {ex.Message}");
+            if (Directory.Exists(Path.Combine(dir.FullName, repositoryName)))
+            {
+                return Path.Combine(dir.FullName, repositoryName);
+            }
+            dir = dir.Parent;
         }
 
-        Console.WriteLine("######################### GPU Compression #########################\n");
-        // Display times
-        Console.WriteLine($"Total compression time (CPU + GPU): {totalCompressionTime} ms");
-        Console.WriteLine($"GPU compression time: {gpuCompressionTime} ms");
-        Console.WriteLine($"Decompression time: {decompressionTime} ms");
-
-        // Check integrity
-        bool isMatch = inputText == decompressedText;
-        Console.WriteLine($"Integrity check: {(isMatch ? "PASSED" : "FAILED")}");
-        Console.WriteLine($"Original size: {input.Length} bytes");
-        Console.WriteLine($"Compressed size: {compressedData.Length} bytes");
-        Console.WriteLine($"Compression ratio: {(double)compressedData.Length / input.Length:P2}");
+        return null;
     }
 
     static (byte[], long) Compress(byte[] input)

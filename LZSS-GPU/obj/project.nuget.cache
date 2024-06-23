@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uYad6vpfc2M=",
+  "dgSpecHash": "FYm6UBg+Fr4=",
   "success": true,
-  "projectFilePath": "D:\\Licenta\\LZSS-CS\\LZSS-GPU\\LZSS-GPU.csproj",
+  "projectFilePath": "D:\\Licenta\\Data-Compression-On-GPU\\LZSS-GPU\\LZSS-GPU.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\instr\\.nuget\\packages\\ilgpu\\1.5.1\\ilgpu.1.5.1.nupkg.sha512",
     "C:\\Users\\instr\\.nuget\\packages\\ilgpu.algorithms\\1.5.1\\ilgpu.algorithms.1.5.1.nupkg.sha512"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ABxvEZd2Y/U=",
+  "dgSpecHash": "aAOSuFD6YMc=",
   "success": true,
-  "projectFilePath": "D:\\Licenta\\LZSS-CS\\LZSS-MT\\LZSS-MT.csproj",
+  "projectFilePath": "D:\\Licenta\\Data-Compression-On-GPU\\LZSS-MT\\LZSS-MT.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

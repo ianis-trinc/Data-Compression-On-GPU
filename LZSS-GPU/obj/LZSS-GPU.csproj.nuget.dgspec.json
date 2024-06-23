@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Licenta\\LZSS-CS\\LZSS-GPU\\LZSS-GPU.csproj": {}
+    "D:\\Licenta\\Data-Compression-On-GPU\\LZSS-GPU\\LZSS-GPU.csproj": {}
   },
   "projects": {
-    "D:\\Licenta\\LZSS-CS\\LZSS-GPU\\LZSS-GPU.csproj": {
+    "D:\\Licenta\\Data-Compression-On-GPU\\LZSS-GPU\\LZSS-GPU.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Licenta\\LZSS-CS\\LZSS-GPU\\LZSS-GPU.csproj",
+        "projectUniqueName": "D:\\Licenta\\Data-Compression-On-GPU\\LZSS-GPU\\LZSS-GPU.csproj",
         "projectName": "LZSS-GPU",
-        "projectPath": "D:\\Licenta\\LZSS-CS\\LZSS-GPU\\LZSS-GPU.csproj",
+        "projectPath": "D:\\Licenta\\Data-Compression-On-GPU\\LZSS-GPU\\LZSS-GPU.csproj",
         "packagesPath": "C:\\Users\\instr\\.nuget\\packages\\",
-        "outputPath": "D:\\Licenta\\LZSS-CS\\LZSS-GPU\\obj\\",
+        "outputPath": "D:\\Licenta\\Data-Compression-On-GPU\\LZSS-GPU\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -75,7 +75,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
